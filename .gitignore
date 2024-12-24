@@ -1,0 +1,29 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.env
+
+# IDE files
+.vscode/
+.idea/
+
+# Local development settings
+*.env
+.env.local
+
+# Logs
+*.log
+
+# Testing
+.coverage
+htmlcov/
+
+# Build
+dist/
+build/
+*.egg-info/
