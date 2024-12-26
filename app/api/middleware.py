@@ -21,6 +21,9 @@ class InternalOnlyMiddleware(BaseHTTPMiddleware):
         ]
 
     async def dispatch(self, request: Request, call_next: Callable):
+        if not request.client:
+            return await call_next(request) # Allow for test client
+            
         client_host = request.client.host
         
         if client_host == "testclient":

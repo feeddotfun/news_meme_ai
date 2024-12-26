@@ -60,6 +60,7 @@ def test_cors_middleware(client):
         "/api/v1/health",
         headers={
             "origin": "http://localhost:3000",
+            "X-Real-IP": "127.0.0.1",
             "access-control-request-method": "GET"
         }
     )
