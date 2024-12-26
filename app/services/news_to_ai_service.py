@@ -12,11 +12,11 @@ class NewsToAIService:
         # Initialize API clients
         self.text_client = InferenceClient(
             model=settings.AI_PROMPT_MODEL,
-            api_key=settings.AI_API_KEY
+            token=settings.AI_API_KEY
         )
         self.image_client = InferenceClient(
             model=settings.AI_IMAGE_MODEL,
-            api_key=settings.AI_API_KEY
+            token=settings.AI_API_KEY
         )
         self.upload_api_url = settings.UPLOAD_API_URL
         self.upload_api_key = settings.UPLOAD_API_KEY
