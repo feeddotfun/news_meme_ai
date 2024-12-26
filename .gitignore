@@ -11,6 +11,7 @@ env/
 # IDE files
 .vscode/
 .idea/
+.DS_Store
 
 # Local development settings
 *.env
