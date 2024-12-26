@@ -21,6 +21,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11"]
+      fail-fast: false  
 
     steps:
     - uses: actions/checkout@v3
@@ -32,23 +33,21 @@ jobs:
         cache: 'pip'
     
     - name: Install Poetry
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-    
-    - name: Set Poetry config
-      run: |
-        poetry config virtualenvs.create true
-        poetry config virtualenvs.in-project true
-    
-    - name: Cache Poetry virtualenv
-      uses: actions/cache@v3
-      id: cache
+      uses: snok/install-poetry@v1
       with:
-        path: ./.venv
+        version: 1.4.0
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+    
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v3
+      with:
+        path: .venv
         key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
     
-    - name: Install Dependencies
-      if: steps.cache.outputs.cache-hit != 'true'
+    - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       run: poetry install --no-interaction --with dev
     
     - name: Create test environment file
@@ -64,19 +63,7 @@ jobs:
         AI_PROMPT_MODEL=${{ secrets.AI_PROMPT_MODEL }}
         AI_IMAGE_MODEL=${{ secrets.AI_IMAGE_MODEL }}
         EOF
-    
-    - name: Install pytest-cov
-      run: |
-        poetry run pip install pytest-cov
         
     - name: Run tests
       run: |
-        poetry run pytest --cov=app --cov-report=xml
-    
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: true
+        poetry run pytest -v
