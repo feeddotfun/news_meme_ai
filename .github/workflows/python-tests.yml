@@ -13,6 +13,11 @@ jobs:
       NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
       AI_API_KEY: ${{ secrets.AI_API_KEY }}
       UPLOAD_API_KEY: ${{ secrets.UPLOAD_API_KEY }}
+      NEWS_BASE_URL: ${{ secrets.NEWS_BASE_URL }}
+      UPLOAD_API_URL: ${{ secrets.UPLOAD_API_URL }}
+      AI_PROMPT_MODEL: ${{ secrets.AI_PROMPT_MODEL }}
+      AI_IMAGE_MODEL: ${{ secrets.AI_IMAGE_MODEL }}
+      
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11"]
