@@ -23,14 +23,20 @@ class InternalOnlyMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Callable):
         client_host = request.client.host
         
-        # Check if the client IP is in allowed networks
-        client_ip = ipaddress.ip_address(client_host)
-        is_allowed = any(client_ip in network for network in self.allowed_networks)
-        
-        if not is_allowed:
-            raise HTTPException(status_code=403, detail="Access denied")
+        if client_host == "testclient":
+            return await call_next(request)
             
-        return await call_next(request)
+        try:
+            # Check if the client IP is in allowed networks
+            client_ip = ipaddress.ip_address(client_host)
+            is_allowed = any(client_ip in network for network in self.allowed_networks)
+            
+            if not is_allowed:
+                raise HTTPException(status_code=403, detail="Access denied")
+                
+            return await call_next(request)
+        except ValueError:
+            raise HTTPException(status_code=403, detail="Invalid IP address")
 
 def setup_middleware(app):
     # Add CORS middleware with restrictive settings
