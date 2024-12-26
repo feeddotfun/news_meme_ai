@@ -1,5 +1,6 @@
 import os
 import sys
+from unittest.mock import MagicMock
 import pytest
 from fastapi.testclient import TestClient
 
@@ -14,6 +15,18 @@ from app import create_app
 def app():
     """Create a fresh app instance for each test."""
     return create_app()
+
+@pytest.fixture(autouse=True)
+def mock_inference_client(monkeypatch):
+    """Mock HuggingFace InferenceClient for all tests."""
+    mock_client = MagicMock()
+    
+    def mock_init(self, model, token):
+        self.model = model
+        self.token = token
+    
+    monkeypatch.setattr("huggingface_hub.InferenceClient.__init__", mock_init)
+    return mock_client
 
 @pytest.fixture
 def client(app):
