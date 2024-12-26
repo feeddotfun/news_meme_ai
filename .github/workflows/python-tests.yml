@@ -9,6 +9,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+      AI_API_KEY: ${{ secrets.AI_API_KEY }}
+      UPLOAD_API_KEY: ${{ secrets.UPLOAD_API_KEY }}
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11"]
@@ -41,6 +45,20 @@ jobs:
     - name: Install Dependencies
       if: steps.cache.outputs.cache-hit != 'true'
       run: poetry install --no-interaction --with dev
+    
+    - name: Create test environment file
+      run: |
+        cat << EOF > .env
+        API_ENV=test
+        API_DEBUG=true
+        NEWS_API_KEY=${{ secrets.NEWS_API_KEY }}
+        AI_API_KEY=${{ secrets.AI_API_KEY }}
+        UPLOAD_API_KEY=${{ secrets.UPLOAD_API_KEY }}
+        NEWS_BASE_URL=${{ secrets.NEWS_BASE_URL }}
+        UPLOAD_API_URL=${{ secrets.UPLOAD_API_URL }}
+        AI_PROMPT_MODEL=${{ secrets.AI_PROMPT_MODEL }}
+        AI_IMAGE_MODEL=${{ secrets.AI_IMAGE_MODEL }}
+        EOF
     
     - name: Install pytest-cov
       run: |
