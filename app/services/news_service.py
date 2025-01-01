@@ -55,7 +55,7 @@ class NewsService:
                         })
                         seen_titles.append(title)
 
-                        if len(news_list) >= 5:  # 5 news items
+                        if len(news_list) >= 6:  # 6 news items
                             break
 
                 return news_list if news_list else self._get_backup_news()
