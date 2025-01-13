@@ -88,7 +88,3 @@ interface MemeResponse {
   timestamp: string;   // ISO format timestamp
 }
 ```
-
-## License
-
-[MIT License](LICENSE)
