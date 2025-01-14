@@ -1,0 +1,16 @@
+name: Trigger Deployment
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Deployment
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          repository: feeddotfun/deployment
+          event-type: feed-app-update
