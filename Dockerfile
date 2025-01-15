@@ -7,7 +7,11 @@ WORKDIR /app
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHONPATH=/app
+    PYTHONPATH=/app \
+    POETRY_VERSION=1.4.0 \
+    POETRY_HOME="/opt/poetry" \
+    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    POETRY_NO_INTERACTION=1
 
 # Install system dependencies
 RUN apt-get update \
@@ -16,14 +20,21 @@ RUN apt-get update \
         build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements
-COPY requirements.txt .
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
+ENV PATH="$POETRY_HOME/bin:$PATH"
+
+# Copy poetry files
+COPY pyproject.toml poetry.lock ./
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN poetry install --no-dev --no-root
 
 # Copy application code
 COPY . .
+
+# Install the project
+RUN poetry install --no-dev
 
 # Create non-root user
 RUN addgroup --system appgroup \
@@ -37,7 +48,7 @@ USER appuser
 EXPOSE 8000
 
 # Command to run the application
-CMD ["uvicorn", "main:app", \
+CMD ["poetry", "run", "uvicorn", "main:app", \
      "--host", "0.0.0.0", \
      "--port", "8000", \
      "--workers", "4", \
