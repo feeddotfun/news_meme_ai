@@ -28,13 +28,13 @@ ENV PATH="$POETRY_HOME/bin:$PATH"
 COPY pyproject.toml ./
 
 # Install dependencies
-RUN poetry install --no-dev --no-root
+RUN poetry install --only main --no-root
 
 # Copy application code
 COPY . .
 
 # Install the project
-RUN poetry install --no-dev
+RUN poetry install --only main
 
 # Create non-root user
 RUN addgroup --system appgroup \
