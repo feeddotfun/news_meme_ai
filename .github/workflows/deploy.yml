@@ -13,4 +13,4 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
           repository: feeddotfun/deployment
-          event-type: feed-app-update
+          event-type: news-meme-ai-update
