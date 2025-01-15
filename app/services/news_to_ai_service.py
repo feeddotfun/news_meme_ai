@@ -65,7 +65,7 @@ class NewsToAIService:
                 temperature=1,
                 top_p=0.95,
                 repetition_penalty=1.3,  # Reduce repetitive responses
-                frequency_penalty=0.5 # Reduce common phrases
+                #frequency_penalty=0.5 # Reduce common phrases
             )
             
             # Clean up response text
