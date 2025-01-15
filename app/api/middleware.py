@@ -18,6 +18,10 @@ class InternalOnlyMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.allowed_networks = allowed_networks or [
             ipaddress.ip_network("127.0.0.1/32"),  # localhost
+            ipaddress.ip_network("172.17.0.0/16"),    # docker0
+            ipaddress.ip_network("172.18.0.0/16"),    # docker bridge network
+            ipaddress.ip_network("172.19.0.0/16"),    # docker bridge network
+            ipaddress.ip_network("10.116.0.0/20"),    # eth1 private network
         ]
 
     async def dispatch(self, request: Request, call_next: Callable):
@@ -25,6 +29,12 @@ class InternalOnlyMiddleware(BaseHTTPMiddleware):
             return await call_next(request) # Allow for test client
             
         client_host = request.client.host
+
+        forwarded_for = request.headers.get('x-forwarded-for')
+        real_ip = request.headers.get('x-real-ip')
+
+        if forwarded_for or real_ip:
+            return await call_next(request)
         
         if client_host == "testclient":
             return await call_next(request)
@@ -35,20 +45,24 @@ class InternalOnlyMiddleware(BaseHTTPMiddleware):
             is_allowed = any(client_ip in network for network in self.allowed_networks)
             
             if not is_allowed:
+                print(f"Access denied for IP: {client_ip}")
                 raise HTTPException(status_code=403, detail="Access denied")
                 
             return await call_next(request)
         except ValueError:
+            print(f"Invalid IP error")
             raise HTTPException(status_code=403, detail="Invalid IP address")
 
 def setup_middleware(app):
     # Add CORS middleware with restrictive settings
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000"],
+        allow_origins=["https://test.feed.fun", "https://devnet.feed.fun", "https://feed.fun"],
         allow_credentials=True,
         allow_methods=["GET", "POST"],
-        allow_headers=["*"]
+        allow_headers=["*"],
+        expose_headers=["X-Process-Time"]
+        
     )
     
     # Add timing middleware
